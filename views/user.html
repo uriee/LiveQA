@@ -1,0 +1,11 @@
+<h1>USER</h1>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+var socket = io.connect();
+
+socket.on('connect', function() {
+  socket.emit('join',JSON.stingify({type : 'u',room , 'one'}));
+});
+      
+      
+</script>

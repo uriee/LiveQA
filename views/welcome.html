@@ -1,1 +1,25 @@
 <h1>WELCOME</h1>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+var socket = io.connect();
+
+socket.on('connect', function() {
+  console.log("on connect");
+  socket.emit('join','one');
+ // socket.emit('addQA',JSON.stringify({name: 'newname',time: 20, showUsers : 'Y'}));
+  socket.emit('addQ',JSON.stringify({qaName : 'newname',q : 'the first q'}));
+});
+      
+socket.on('answers',function(answer) {
+  console.log("aaa:",answer);
+});
+      
+socket.on('addQA',function(ret){
+  console.log("addQA:",ret);
+});      
+   
+socket.on('addQ',function(ret){
+  console.log("addQA:",ret);
+});      
+      
+</script>

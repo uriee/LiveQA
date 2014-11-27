@@ -7,50 +7,6 @@ module.exports = function(Q) {
   
   var ret = {};
   
-  ret.Smembers = function(key) {
-    var d = Q.defer();
-    client.smembers(key, function(err, ret) {
-      if (err) {
-        console.log("Err Smembers", key, err);
-        d.reject(err);
-      } else d.resolve(ret);
-    });
-    return d.promise;
-  };
-
-  ret.Sadd = function(key, val) {
-    var d = Q.defer();
-    client.sadd(key, val, function(err, ret) {
-      if (err) {
-        console.log("Err Sadd", key, val, err);
-        d.reject(err);
-      } else d.resolve(ret);
-    });
-    return d.promise;
-  };
-
-  ret.Srem = function(key, val) {
-    var d = Q.defer();
-    client.srem(key, val, function(err, ret) {
-      if (err) {
-        console.log("Err Srem", key, val, err);
-        d.reject(err);
-      } else d.resolve(ret);
-    });
-    return d.promise;
-  };
-
-  ret.Sismember = function(key, val) {
-    var d = Q.defer();
-    client.sismember(key, val, function(err, ret) {
-      if (err) {
-        console.log("Err Sismember", key, val, err);
-        d.reject(err);
-      } else d.resolve(ret);
-    });
-    return d.promise;
-  };
-
   ret.Set = function(key, val) {
     var d = Q.defer();
     client.set(key, val, function(err, ret) {
@@ -83,6 +39,39 @@ module.exports = function(Q) {
     });
     return d.promise;
   };
+  
+  ret.Lpush = function(key, val) {
+    var d = Q.defer();
+    client.lpush(key, val, function(err, ret) {
+      if (err) {
+        console.log("Err lpush", key, val, err);
+        d.reject(err);
+      } else d.resolve(ret);
+    });
+    return d.promise;
+  };  
+  
+  ret.Lget = function(key) {
+    var d = Q.defer();
+    client.lrange(key, 0,-1, function(err, ret) {
+      if (err) {
+        console.log("Err Lget", key, val, err);
+        d.reject(err);
+      } else d.resolve(ret);
+    });
+    return d.promise;
+  };  
+  
+  ret.Incr = function(key) {
+    var d = Q.defer();
+    client.incr(key, 1, function(err, ret) {
+      if (err) {
+        console.log("Err incr", key, val, err);
+        d.reject(err);
+      } else d.resolve(ret);
+    });
+    return d.promise;
+  };  
   
   ret.newID = function(){
     var d = new Date().getTime();
