@@ -1,11 +1,33 @@
-<h1>ADMIN</h1>
+<h1>Admin</h1>
     <script src="/socket.io/socket.io.js"></script>
     <script>
 var socket = io.connect();
-
+var  QA =  '<%= key %>';
+      
 socket.on('connect', function() {
-  
+  console.log("on connect");
+  socket.emit('addQA',JSON.stringify({name: 'newname',time: 20, showUsers : 'Y'}));
+  setTimeout(function(){socket.emit('addQ',JSON.stringify({qaName : 'newname',q : 'the first q'}))},4000);
+  setTimeout(function(){socket.emit('addQ',JSON.stringify({qaName : 'xnewname',q : 'the first q'}))},7000);
 });
       
+socket.on('answers',function(answer) {
+  console.log("aaa:",answer);
+});
+      
+socket.on('addQA',function(ret){
+  console.log("addQA:",ret);
+});      
+   
+socket.on('addQ',function(ret){
+  console.log("addQ:",ret,'<%= key %>');
+  var keys = {Q: ret, QA: '<%= key %>'};
+  setTimeout(function(){socket.emit('dispatch',keys)},4000);
+});
+
+socket.on('dispatch',function(ret){
+  console.log("dispatch:",ret);
+});
+     
       
 </script>

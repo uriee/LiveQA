@@ -28,18 +28,19 @@ app.get('/join/:qaName', function(req, res) {
       })
 });
 
+
+app.get('/admin/:key', function(req, res) {
+    res.render('admin', {
+        'key': req.params.key,
+        'url': req.protocol + '://' + req.get('host'),
+        'startAt' : 'welcome'
+    });
+});
+
 app.get('/*', function(req, res) {
     res.render('welcome', {
         'massage': '',
         'url': req.protocol + '://' + req.get('host'),
-    });
-});
-
-app.get('/admin/:key', function(req, res) {
-    res.render('main', {
-        'massage': '',
-        'url': req.protocol + '://' + req.get('host'),
-        'startAt' : 'welcome'
     });
 });
 
@@ -54,34 +55,35 @@ io.on('connection', function(socket) {
     console.log('userCount:',app.userCount-- - 1,Date());
   });
   
-  socket.on('join',function(room){
-    socket.join(room);
-    socket.emit('join');
-    console.log("join in:",room);
-    io.to(room).emit('answers',JSON.stringify({a: 'uri'}));
+  socket.on('join',function(QAname){
+    getQAKey(QAname).then(function(key) {
+    socket.join(key);
+    socket.emit('join',QAname);
+    console.log("user join to:",QAname , key);
+    });
   });
 
-  socket.on('dispatch',function(qKey){
-    redis.get('Q:'+qKey).then(function(q) {
+  socket.on('dispatch',function(keys){
+    redis.Get('Q:'+keys.Q).then(function(q) {
       if (!q) socket.emit('dispatch','0');
       else {
-        room = JSON.parse(q).key;
-        io.to(room).emit('getQ',q);
+        io.in(keys.QA).emit('dispatch',q);
         socket.emit('dispatch','1');
       }
     });
   })
   
   socket.on('answer',function(data){
-    var inp = JSON.parse(data);
-    var qKey = inp.qKey,
+    var  inp = JSON.parse(data);
+    var Qkey = inp.Qkey,
+       QAkey = inp.QAkey,
       answer = inp.answer,
-        user = inp.user;
-    var ans = JSON.stringify({user : user, answer : answer})
-    if(!qKey || !answer) socket.emit('answered','0');  
-    redis.Lpush('A:'+qKey,ans).then(function(){
-      io.broadcast.to(qKey).emit('answers',ans);
-      redis.Lget('A:'+qKey,function(all_available_answers){
+        user = inp.user,
+         ans = JSON.stringify({user : user, answer : answer})
+    if(!QAkey || !answer) socket.emit('answered','0');  
+    redis.Lpush('A:'+Qkey,ans).then(function(){
+      io.broadcast.to(QAkey).emit('answers',ans);
+      redis.Lget('A:'+Qkey,function(all_available_answers){
         socket.emit('answers',JSON.stringify(all_available_answers));
       });
     },function(e) {
@@ -117,32 +119,41 @@ io.on('connection', function(socket) {
     console.log("addQ:",data);
     var inp = JSON.parse(data);
     var newid,
-        key;
+        QAkey;
     getQAKey(inp.qaName).then(function(key) {
-      this.key = key;
+      QAkey = key;
       newid = redis.newID()
       var order = new Date().getTime().toString();
-      var obj = {key : newid, q : inp.q , qa : key, order : order};
+      var obj = {key : newid, Q : inp.q , QA : inp.qaName, order : order};
       return redis.Set('Q:'+newid,JSON.stringify(obj))
     }).then(function(ret) {
         if(ret === null) throw new Error("Could not set a Q");
-      return redis.Lpush('QAQ:' + key, newid);
+      return redis.Lpush('QAQ:' + QAkey, newid);
     }).then(function(ret) {
           if (ret === null) throw new Error("Could not push Q to Q");
-          socket.emit('addQ','1');
+          socket.emit('addQ',newid);
         },function(e){
           socket.emit('addQ','0');
           console.log("error with addQ:",e);
         });
       
   });
-
-
+  
+  socket.on('dispatch',function(Qkey){
+    redis.Get('Q:'+Qkey).then(function(data){
+      var inp = JSON.parse(data);
+      var QA = inp.QA,
+          question = JSON.stringify(inp.Q);
+      getQAKey(QA).then(function(QAkey) {
+      io.broadcast.to(QAkey).emit('dispatch',question);
+      socket.emit('dispatch','1');
+      })
+    })
+  }); 
+    
 }); // end socket listeners
 
  
-     
-  
 function initQA(variables) {
   if (!variables.name) return 0;
     variables.time = variables.time || 20;
