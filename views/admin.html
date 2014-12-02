@@ -1,14 +1,24 @@
-<h1>Admin</h1>
+<html>
+  <head>
+    <title>Hello React</title>
+    <base href="/" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">    
+    <script src="http://fb.me/react-0.12.1.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.1.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>    
     <script>
 var socket = io.connect();
 var  QA =  '<%= key %>';
-      
+  
 socket.on('connect', function() {
   console.log("on connect");
-  socket.emit('addQA',JSON.stringify({name: 'newname',time: 20, showUsers : 'Y'}));
+  /*socket.emit('addQA',JSON.stringify({name: 'newname',time: 20, showUsers : 'Y'}));
   setTimeout(function(){socket.emit('addQ',JSON.stringify({qaName : 'newname',q : 'the first q'}))},4000);
   setTimeout(function(){socket.emit('addQ',JSON.stringify({qaName : 'xnewname',q : 'the first q'}))},7000);
+  */
 });
       
 socket.on('answers',function(answer) {
@@ -30,4 +40,73 @@ socket.on('dispatch',function(ret){
 });
      
       
+</script>    
+  </head>
+  <body>
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src="/js/materialize.min.js"></script> 
+    <h1> <b> Admin</b></h1>
+
+<div class="">
+      <ul class="collapsible collapsible-expandable">
+        <li class="">
+          <div class="collapsible-header"><i class="mdi-action-exit-to-app"></i>Add Question</div>
+          <div class="collapsible-body" style="display: none;">
+            <form action="#">
+             <div class="row">
+              <div class='col s9'>
+                <div class='row'>
+                <div class='col s3 '>
+                  <input name="group1" type="radio" id="test1" />
+                  <label for="test1">Y/N</label>
+                </div>
+                <div class='col s5 '>
+                  <input name="group1" type="radio" id="test2" />
+                  <label for="test2">Rating</label>
+                </div>
+                <div class='col s4'>
+                  <input name="group1" type="radio" id="test3"  />
+                  <label for="test3">Multi</label>
+                </div>
+              </div> 
+                <br>
+                <div class="input-field col s12">
+                <textarea required="" ></textarea>                
+                <label class="active">Question:</label>
+                </div>
+
+             </div>     
+              <div class="col s3">  
+                <a class="btn waves-effect waves-light" style="width:10%" href="/"><i class="mdi-action-get-app"></i></a>
+                <a class="btn waves-effect waves-light" style="width:10%" href="/"><i class="mdi-action-get-app"></i></a>
+              </div>  
+             </div>   
+            </form>
+          </div>
+        </li>
+        <li class="">
+          <div class="collapsible-header"><i class="mdi-action-get-app"></i>Dispatch Them</div>
+          <div class="collapsible-body" style="display: none;"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p></div>
+        </li>
+      </ul>
+    </div>    
+    
+
+  
+  
+    <div id="content"></div>
+
+<script>
+ $(document).ready(function(){
+    $('.collapsible').collapsible({ "accordion" : false });
+  });
 </script>
+      
+    
+    <script type="text/jsx">
+      // Your code here
+    </script>
+  </body>
+</html>
+
+

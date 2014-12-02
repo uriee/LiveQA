@@ -13,12 +13,15 @@ app.set('view engine', 'html');
 
 /*---------------Routers--------------------------------------*/
 
-app.get('/join/:qaName', function(req, res) {
+app.get('/join/:qaName/:userName', function(req, res) {
   redis.Get('QAname:'+req.params.qaName).then(function(key){
-    redis.Get('QA:'+key).then(function(variables){
-      res.render('join', {
+    redis.Get('QA:'+key).then(function(vrbls){
+      var variables = JSON.parse(vrbls)
+      res.render('user', {
         name : req.params.quName,
-        variables: variables 
+        time : variables.time,
+        showUsers : variables.showUsers,
+        user : req.params.userName
       });       
     })
   }).fail(function(e){
@@ -76,11 +79,10 @@ io.on('connection', function(socket) {
   socket.on('answer',function(data){
     var  inp = JSON.parse(data);
     var Qkey = inp.Qkey,
-       QAkey = inp.QAkey,
       answer = inp.answer,
         user = inp.user,
          ans = JSON.stringify({user : user, answer : answer})
-    if(!QAkey || !answer) socket.emit('answered','0');  
+    if(!Qkey || !answer) socket.emit('answered','0');  
     redis.Lpush('A:'+Qkey,ans).then(function(){
       io.broadcast.to(QAkey).emit('answers',ans);
       redis.Lget('A:'+Qkey,function(all_available_answers){

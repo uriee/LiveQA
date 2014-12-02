@@ -1,11 +1,47 @@
-<h1>USER</h1>
+<html>
+  <head>
+    <title>Hello React</title>
+    <script src="http://fb.me/react-0.12.1.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.1.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
 var socket = io.connect();
-
+var question;   
+var name = '<%= key %>',
+    time = '<%= time %>',
+    showUsers = '<%= showUsers %>',
+    user =   '<%= user %>';
+          
+      
 socket.on('connect', function() {
-  socket.emit('join',JSON.stingify({type : 'u',room , 'one'}));
+  console.log("on connect");
+  socket.emit('join','<%= name %>');
+});
+
+socket.on('join',function(ret) {
+  console.log("joined:",ret);
+});      
+      
+socket.on('answers',function(answer) {
+  console.log("aaa:",answer);
 });
       
-      
-</script>
+
+socket.on('dispatch',function(ret){
+  console.log("dispatch:",ret);
+  question = JSON.parse(ret)
+  var answer = {Qkey : question.key, answer : 1,user: user};
+  setTimeout(function(){socket.emit('answer',answer)},2000);    
+});
+           
+</script>    
+  </head>
+  <body>
+    <h1>USER</h1>
+    <div id="content"></div>
+    <script type="text/jsx">
+      // Your code here
+    </script>
+  </body>
+</html>

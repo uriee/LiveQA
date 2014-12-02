@@ -1,7 +1,13 @@
-<h1>WELCOME</h1>
+<html>
+  <head>
+    <title>Hello React</title>
+    <script src="http://fb.me/react-0.12.1.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.1.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
 var socket = io.connect();
+var question;      
       
 socket.on('connect', function() {
   console.log("on connect");
@@ -19,6 +25,18 @@ socket.on('answers',function(answer) {
 
 socket.on('dispatch',function(ret){
   console.log("dispatch:",ret);
+  question = JSON.parse(ret)
+ 
 });
            
-</script>
+</script>    
+  </head>
+  <body>
+    <h1>WELCOME</h1>
+    <div id="content"></div>
+    <script type="text/jsx">
+      // Your code here
+    </script>
+  </body>
+</html>
+
