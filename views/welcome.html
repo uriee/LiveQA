@@ -1,10 +1,17 @@
 <html>
   <head>
     <title>Hello React</title>
-    <script src="http://fb.me/react-0.12.1.js"></script>
-    <script src="http://fb.me/JSXTransformer-0.12.1.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <title>LiveQA Admin</title>
+    <base href="/" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">    
     <script src="/socket.io/socket.io.js"></script>
+    <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>  
+    <script src="/js/react.js"></script>
+    <script src="/js/JSXTransformer.js"></script>      
+  <script src="/js/jquery-2.1.1.min.js"></script>
+  <script src="/js/materialize.min.js"></script>    
     <script>
 var socket = io.connect();
 var question;      
@@ -32,10 +39,56 @@ socket.on('dispatch',function(ret){
 </script>    
   </head>
   <body>
-    <h1>WELCOME</h1>
-    <div id="content"></div>
+
+  <div id="content"></div>
     <script type="text/jsx">
-      // Your code here
+var center = {
+  width: '80%',
+  display: 'block',
+  'marginLeft': 'auto',
+  'marginRight': 'auto'
+};
+
+var welcome = React.createClass({
+change : function(){
+        React.render(React.createElement(newQA),
+        document.getElementById('content')
+      );
+},	
+  render: function () {
+    return (
+  <div style={center}>
+       <form clasName="col s12">
+        <input id="qaname" type="text" required=""/>
+        <label htmlFor="qaname">Q&a</label>
+        <input id="nickname" type="text" required=""/>
+        <label htmlFor="nickname">NickName</label>
+      </form>
+      <a className="btn waves-effect waves-light"  onClick={this.change} >Answer<i className="mdi-action-get-app"></i></a>
+    </div>
+
+    );
+  }
+});
+
+var newQA = React.createClass({
+  render: function () {
+    return (
+	<div style={center}>
+       <form clasName="col s12">
+        <input id="qaname" type="text" required=""/>
+        <label htmlFor="qaname">Your Q&a Name</label>
+        <input id="time" type="text" required=""/>
+        <label htmlFor="time">Time (in seconds) to Answer A Question</label>
+      </form>
+      <a className="btn waves-effect waves-light"  href="/">Creat&Lunch<i className="mdi-action-get-app"></i></a>
+    </div>
+    );
+  }
+});
+      React.render(React.createElement(welcome),
+        document.getElementById('content')
+      );
     </script>
   </body>
 </html>
