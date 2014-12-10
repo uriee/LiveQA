@@ -14,16 +14,18 @@ app.set('view engine', 'html');
 /*---------------Routers--------------------------------------*/
 
 app.get('/join/:qaName/:userName', function(req, res) {
-  redis.Get('QAname:'+req.params.qaName).then(function(key){
-    redis.Get('QA:'+key).then(function(vrbls){
+  redis.Get('QAname:'+req.params.qaName)
+  .then(function(key){
+    return redis.Get('QA:'+key)
+  })
+  .then(function(vrbls){
       var variables = JSON.parse(vrbls)
-      res.render('user', {
+      res.render('ruser', {
         name : req.params.quName,
         time : variables.time,
         showUsers : variables.showUsers,
         user : req.params.userName
       });       
-    })
   }).fail(function(e){
         res.render('error', {
           e : e

@@ -1,0 +1,222 @@
+<html>
+  <head>
+    <title>LiveQA</title>
+    <base href="/" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">    
+    <script src="/js/react.min.js"></script>
+    <script src="/js/JSXTransformer.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link type="text/css" rel="stylesheet" href="/css/materialize.min.css"  media="screen,projection"/>     
+  </head>
+  <body>
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src="/js/materialize.min.js"></script>     
+    <script type="text/jsx">
+var socket = io.connect();
+var question;   
+var QAname = '<%= name %>',
+    time = '<%= time %>',
+    showUsers = '<%= showUsers %>',
+    nickname =   '<%= user %>';
+              
+/**
+ * @jsx React.DOM
+ */
+var socket = io.connect();
+var answers = [];
+var answersVisible;
+
+var Idle = React.createClass({
+	render: function(){
+		return(
+			<div>
+				<h1><strong>IDLEeeeeeeee</strong></h1> 
+			</div>
+		)
+	}
+});
+
+var Header = React.createClass({
+	render: function(){
+		return(
+			<div className='row'> 
+				<div className="col s4">
+					<h1><strong>LiveQA</strong></h1> 
+				</div>
+				<div className="col s4">
+					<h3><strong>{QAname}</strong></h3> 
+					<h3><strong>{nickname}</strong></h3> 
+				</div>	
+				<div className="col s4">
+					<h2><strong>{time}</strong></h2> 
+				</div>	
+      </div>
+		)
+	}
+});
+
+var Question = React.createClass({
+	render: function(){
+		return(
+			<div className="question">
+				<h1><strong>{this.props.question}</strong></h1> 
+			</div>
+		)
+	}
+});
+
+var AnswerList = React.createClass({
+  answers : function(ans){
+    console.log("executed answer");
+    if (ans) return ['1','25','3'];
+    return ['1','2','3'];
+    }(2),
+  render: function(){
+      var renderAnswer = function(answer){
+          return <div className='col s2'><Answer ans={ answer} onAnswerSubmit={this.props.onAnswerSubmit}/></div> 
+      };
+      return (
+      <div>
+          <h3> Vote: </h3>
+          <div className='row'>{this.answers.map(renderAnswer.bind(this))} </div>
+      </div>    
+      );
+  }
+});
+
+var Answer = React.createClass({
+	handleAnswer : function(e){
+		e.preventDefault();
+		var answer = {
+			user : nickname,
+			answer : e.target.innerText
+		}
+		this.props.onAnswerSubmit(answer);	
+	},	
+  render: function(){
+      return (
+          <div className='col s2' onClick={this.handleAnswer} >
+              { this.props.ans}                
+          </div>
+      );
+  }
+});
+
+var Results = React.createClass({
+  getInitialState: function(){
+      return {answers: this.props.answers};
+  },
+  render: function(){
+      var renderAnswer = function(Ans){
+	      return <li> { Ans.title} - { Ans.count} </li>
+	  };
+      return (
+          <div className='col s2' >
+              { this.state.answers.map(renderAnswer)}                
+          </div>
+      );
+  }
+});
+
+
+var App = React.createClass({
+
+	getInitialState: function(){
+
+		socket.on('connect', this.connect);
+		socket.on('dispatch', this.questionRecieve);
+		socket.on('answer', this.AnswerRecieve);		
+		socket.on('init', this.initialize);
+
+		return {answers: [], question: {}, time: 60,answer: null};
+	},
+
+	initialize: function(data){
+		this.setState({ question: {},answers: [],answer : null,showResults : 'hidden'});
+	},
+	connect: function(data){
+		console.log(data);
+	}  ,
+
+	questionRecieve: function(data){
+		var inp = JSON.parse(data)
+		this.setState({
+			question : inp.Question,
+			answer : null,
+			time : inp.time
+		});
+
+	},
+
+	answerRecieve: function(answer){
+		this.Answers.push(JSON.parse(answer));
+		this.setState({ Answers : Answers});
+	},
+
+	handleAnswerSubmit : function(answer){
+		console.log("oorooroor",answer);
+		this.setState({ answer : answer.answer });
+		this.setState({ showResults : 'visible' });
+		//socket.emit('answer', JSON.stringify(answer));
+	},
+
+	render : function(){
+		answersVisible = (this.state.answer) ? false : true;
+		isIdle = (this.state.question) ? true : false;
+		return (
+			<div>
+				<Header time={this.state.time} />
+				<Question question='uriuriUriuri' visible={isIdle}/>
+      	<AnswerList answers={this.state.question.answers} onAnswerSubmit={this.handleAnswerSubmit}  visible={answersVisible}/>
+      	<Results answers={this.state.answers} answer={this.state.answer} visible={isIdle}/>
+      	<Idle visible={!isIdle}/>
+			</div>
+		);
+	}
+});
+
+React.renderComponent(<App/>, document.body);
+/*
+var QuestionForm = React.createClass({
+
+	getInitialState: function(){
+		return {text: '',type : 0};
+	},
+
+	handleSubmit : function(e){
+		e.preventDefault();
+		var question = {
+			type : this.state.type,
+			text : this.state.text
+		}
+		this.props.onQuestionSubmit(question);	
+		this.setState({ text: '' });
+	},
+
+	changeHandler : function(e){
+		this.setState({ text : e.target.value });
+	},
+
+	render: function(){
+		return(
+			<div class='question_form'>
+				<h3>Choose Question Type</h3>
+				<div class='row'>
+					<div class={col s2 btn}>Y/N</div>
+					<div class={col s2 btn}>1 2 5</div>
+					<div class={col s2 btn}>custum</div>										
+				<h3>Write New Question</h3>
+				<form onSubmit={this.handleSubmit}>
+					<input onChange={this.changeHandler} value={this.state.text} />
+				</form>
+			</div>
+		);
+	}
+});
+*/
+    </script>
+  </body>
+</html>
